@@ -57,8 +57,11 @@ function processImage(img)
 	};
 }
 
-
 function generateTerrainMesh(heightmapData) {
+	// for this implementation, i have used separate buffers for triangle mesh and wireframe. 
+	// however, using push() with big files caused performance issues. so i have pre-allocated the arrays. 
+	// in future we can work with indices and a single buffer to reduce memory usage.
+
 	var width = heightmapData.width;
 	var height = heightmapData.height;
 	var data = heightmapData.data;
