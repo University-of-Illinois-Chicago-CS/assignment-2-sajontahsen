@@ -41,18 +41,43 @@
                 <td>Y Rotation</td>
                 <td><input id="rotation" type="range" min="0" max="360" value="0">
                 </td>
+                <td>
+                    <button id="resetButton" onclick="resetCamera()" style="padding: 5px 5px; cursor: pointer;">Reset Camera</button>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Z Rotation</td>
+                <td><input id="zrotation" type="range" min="0" max="360" value="0">
+                </td>
             </tr>
 
             <tr>
                 <td>Zoom</td>
-                <td><input value="0" id="scale" type="range" min="0" max="200" value="0">
+                <td><input value="100" id="scale" type="range" min="10" max="200" value="100">
                 </td>
             </tr>
 
-
+            
             <tr>
                 <td>height</td>
                 <td><input value="50" id="height" type="range" min="0" max="100" value="0">
+                </td>
+            </tr>
+
+            <tr>
+                <td>Projection</td>
+                <td>
+                    <select id="projection">
+                        <option value="perspective">Perspective</option>
+                        <option value="orthographic">Orthographic</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Wireframe</td>
+                <td><input type="checkbox" id="wireframe">
                 </td>
             </tr>
 
@@ -63,6 +88,19 @@
             </tr>
 
         </table>
+    </div>
+
+    <div id="help" style="position: absolute; right: 5px; top: 5px; background-color: #001d62bd; color: white; border: 2px solid black; padding: 10px; max-width: 250px; font-size: 12px;">
+        <h3 style="margin: 0 0 10px 0; font-size: 14px;">Controls</h3>
+        <ul style="margin: 0; padding-left: 20px;">
+            <li><b>Left Click + Drag:</b> Rotate (horizontal = Y-axis, vertical = Z-axis)</li>
+            <li><b>Right Click + Drag:</b> Pan camera (X-Z plane)</li>
+            <li><b>Mouse Wheel:</b> Zoom in/out</li>
+            <li><b>Sliders:</b> Fine-tune rotation and zoom</li>
+            <li><b>Height:</b> Adjust terrain elevation scale</li>
+            <li><b>Projection:</b> Switch perspective/orthographic</li>
+            <li><b>Wireframe:</b> Toggle wireframe view</li>
+        </ul>
     </div>
 </body>
 </html>
