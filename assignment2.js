@@ -63,9 +63,19 @@ function generateTerrainMesh(heightmapData) {
 	var height = heightmapData.height;
 	var data = heightmapData.data;
 
-	// hold vertex positions
-	var positions = [];
-	var wireframePositions = [];  
+	// calculate array sizes upfront
+	var numQuads = (width - 1) * (height - 1);
+	var numTriangles = numQuads * 2;
+	var numVertices = numTriangles * 3;  
+	var numWireframeLines = numQuads * 6;  
+	var numWireframeVertices = numWireframeLines * 2;  
+
+	// pre-allocate typed arrays (to address problem with push() and big files)
+	var positions = new Float32Array(numVertices * 3);
+	var wireframePositions = new Float32Array(numWireframeVertices * 3);
+	
+	var posIdx = 0;  // idx for positions array
+	var wireIdx = 0;  // idx for wireframe array
 
 	// get triangles - 2 for each grid
 	for (var row = 0; row < height - 1; row++) {
@@ -87,26 +97,36 @@ function generateTerrainMesh(heightmapData) {
 			var y4 = data[bottomRight];
 
 			// first triangle (top-left, bottom-left, top-right)
-			positions.push(x1, y1, z1);  
-			positions.push(x1, y3, z2);  
-			positions.push(x2, y2, z1);  
+			positions[posIdx++] = x1; positions[posIdx++] = y1; positions[posIdx++] = z1;
+			positions[posIdx++] = x1; positions[posIdx++] = y3; positions[posIdx++] = z2;
+			positions[posIdx++] = x2; positions[posIdx++] = y2; positions[posIdx++] = z1;
 
 			// second triangle (top-right, bottom-left, bottom-right)
-			positions.push(x2, y2, z1);  
-			positions.push(x1, y3, z2); 
-			positions.push(x2, y4, z2);  
+			positions[posIdx++] = x2; positions[posIdx++] = y2; positions[posIdx++] = z1;
+			positions[posIdx++] = x1; positions[posIdx++] = y3; positions[posIdx++] = z2;
+			positions[posIdx++] = x2; positions[posIdx++] = y4; positions[posIdx++] = z2;
 
 			// wireframe line segments with vertex pairs 
 			
 			// first triangle edges
-			wireframePositions.push(x1, y1, z1, x1, y3, z2);  
-			wireframePositions.push(x1, y3, z2, x2, y2, z1);  
-			wireframePositions.push(x2, y2, z1, x1, y1, z1);  
+			wireframePositions[wireIdx++] = x1; wireframePositions[wireIdx++] = y1; wireframePositions[wireIdx++] = z1;
+			wireframePositions[wireIdx++] = x1; wireframePositions[wireIdx++] = y3; wireframePositions[wireIdx++] = z2;
+			
+			wireframePositions[wireIdx++] = x1; wireframePositions[wireIdx++] = y3; wireframePositions[wireIdx++] = z2;
+			wireframePositions[wireIdx++] = x2; wireframePositions[wireIdx++] = y2; wireframePositions[wireIdx++] = z1;
+			
+			wireframePositions[wireIdx++] = x2; wireframePositions[wireIdx++] = y2; wireframePositions[wireIdx++] = z1;
+			wireframePositions[wireIdx++] = x1; wireframePositions[wireIdx++] = y1; wireframePositions[wireIdx++] = z1;
 
 			// second triangle edges
-			wireframePositions.push(x2, y2, z1, x1, y3, z2); 
-			wireframePositions.push(x1, y3, z2, x2, y4, z2);  
-			wireframePositions.push(x2, y4, z2, x2, y2, z1);  
+			wireframePositions[wireIdx++] = x2; wireframePositions[wireIdx++] = y2; wireframePositions[wireIdx++] = z1;
+			wireframePositions[wireIdx++] = x1; wireframePositions[wireIdx++] = y3; wireframePositions[wireIdx++] = z2;
+			
+			wireframePositions[wireIdx++] = x1; wireframePositions[wireIdx++] = y3; wireframePositions[wireIdx++] = z2;
+			wireframePositions[wireIdx++] = x2; wireframePositions[wireIdx++] = y4; wireframePositions[wireIdx++] = z2;
+			
+			wireframePositions[wireIdx++] = x2; wireframePositions[wireIdx++] = y4; wireframePositions[wireIdx++] = z2;
+			wireframePositions[wireIdx++] = x2; wireframePositions[wireIdx++] = y2; wireframePositions[wireIdx++] = z1;
 		}
 	}
 
@@ -156,14 +176,12 @@ window.loadImageFile = function(event)
 			// terrain mesh from heightmap
 			var terrainMesh = generateTerrainMesh(heightmapData);
 
-			// new buffer with terrain data
-			var terrainVertices = new Float32Array(terrainMesh.positions);
-			var posBuffer = createBuffer(gl, gl.ARRAY_BUFFER, terrainVertices);
+			// new buffer with terrain data 
+			var posBuffer = createBuffer(gl, gl.ARRAY_BUFFER, terrainMesh.positions);
 			vertexCount = terrainMesh.positions.length / 3;
 
 			// wireframe vertex buffer 
-			var wireframeVertices = new Float32Array(terrainMesh.wireframePositions);
-			var wireframeBuffer = createBuffer(gl, gl.ARRAY_BUFFER, wireframeVertices);
+			var wireframeBuffer = createBuffer(gl, gl.ARRAY_BUFFER, terrainMesh.wireframePositions);
 			wireframeVertexCount = terrainMesh.wireframePositions.length / 3;
 
 			var posAttribLoc = gl.getAttribLocation(program, "position");
